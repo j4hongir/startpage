@@ -333,6 +333,29 @@ body{
   gap:6px;
 }
 
+/* Backup (export/import) */
+.backup{
+  display:flex;
+  gap:6px;
+}
+.backup button{
+  flex:1;
+  border:1px solid var(--line);
+  background:var(--surface);
+  color:var(--fg);
+  padding:8px 10px;
+  border-radius:8px;
+  cursor:pointer;
+  font-size:13px;
+  transition:border-color var(--tr-fast), transform var(--tr-fast), background-color var(--tr-fast);
+}
+.backup button:hover{
+  border-color:var(--accent);
+  background:color-mix(in srgb, var(--accent) 10%, var(--surface) 90%);
+  transform:translateY(-1px);
+}
+.backup button:active{transform:translateY(0)}
+
 /* mobile */
 @media (max-width:640px){
   body{padding:12px}

@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="en" data-theme="gruvbox-dark">
 <head>
@@ -50,6 +49,15 @@
         <input id="new-name" type="text" data-i18n-ph="newName" placeholder="Name">
         <input id="new-url" type="text" placeholder="https://...">
         <button id="add-link" type="button" data-i18n="addBtn">add</button>
+      </div>
+    </section>
+
+    <section class="group">
+      <h2 data-i18n="sBackup">Backup</h2>
+      <div class="backup">
+        <button id="export-btn" type="button" data-i18n="exportBtn">export</button>
+        <button id="import-btn" type="button" data-i18n="importBtn">import</button>
+        <input id="import-file" type="file" accept="application/json" class="hidden">
       </div>
     </section>
   </aside>

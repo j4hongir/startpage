@@ -26,6 +26,10 @@
       ipTitle:       'ip info',
       ipCheck:       'check',
       settingsLabel: 'settings',
+      sBackup:       'backup',
+      exportBtn:     'export',
+      importBtn:     'import',
+      importErr:     'invalid backup file',
     },
     ru: {
       sLang:         'язык',
@@ -42,6 +46,10 @@
       ipTitle:       'ip info', 
       ipCheck:       'проверить',
       settingsLabel: 'настройки',
+      sBackup:       'резервная копия',
+      exportBtn:     'экспорт',
+      importBtn:     'импорт',
+      importErr:     'некорректный файл бэкапа',
     }
   };
 
@@ -91,6 +99,9 @@
     el.newName = document.getElementById('new-name');
     el.newUrl = document.getElementById('new-url');
     el.addBtn = document.getElementById('add-link');
+    el.exportBtn = document.getElementById('export-btn');
+    el.importBtn = document.getElementById('import-btn');
+    el.importFile = document.getElementById('import-file');
   }
 
   function buildDrop() {
@@ -201,6 +212,10 @@
     el.newUrl.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') addLink();
     });
+
+    el.exportBtn.addEventListener('click', exportData);
+    el.importBtn.addEventListener('click', () => el.importFile.click());
+    el.importFile.addEventListener('change', importData);
   }
 
   function onPanelChange(e) {
@@ -813,6 +828,86 @@
 
     frag.appendChild(document.createTextNode('}'));
     return frag;
+  }
+
+  function exportData() {
+    const payload = {
+      version: 1,
+      exportedAt: new Date().toISOString(),
+      cfg: {
+        theme: s.theme,
+        engine: s.engine,
+        lang: s.lang,
+        blocks: s.blocks
+      },
+      links: s.links,
+      bmStats
+    };
+
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `ts-startpage-${new Date().toISOString().slice(0, 10)}.json`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  function importData(e) {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      let data;
+      try {
+        data = JSON.parse(reader.result);
+      } catch {
+        alert((STRINGS[s.lang] || STRINGS.en).importErr);
+        return;
+      }
+
+      if (!data || typeof data !== 'object') {
+        alert((STRINGS[s.lang] || STRINGS.en).importErr);
+        return;
+      }
+
+      const cfg = data.cfg || {};
+      s.theme = typeof cfg.theme === 'string' ? cfg.theme : s.theme;
+      s.engine = typeof cfg.engine === 'string' ? cfg.engine : s.engine;
+      s.lang = typeof cfg.lang === 'string' ? cfg.lang : s.lang;
+      s.blocks = { ...DEF.blocks, ...(cfg.blocks && typeof cfg.blocks === 'object' ? cfg.blocks : {}) };
+
+      if (Array.isArray(data.links)) {
+        s.links = data.links
+          .filter(x => x && typeof x === 'object' && typeof x.u === 'string')
+          .map(x => ({
+            id: typeof x.id === 'string' && x.id ? x.id : id(),
+            n: typeof x.n === 'string' && x.n.trim() ? x.n.trim() : 'link',
+            u: normalizeUrl(x.u) || x.u,
+            e: x.e ? 1 : 0
+          }));
+
+        if (!s.links.length) s.links = DEF_LINKS;
+      }
+
+      if (data.bmStats && typeof data.bmStats === 'object') {
+        bmStats = data.bmStats;
+        localStorage.setItem(K.BM_STATS, JSON.stringify(bmStats));
+      }
+
+      persist();
+      renderAll();
+
+      if (s.blocks.ip && !ipInited) initIp();
+    };
+
+    reader.onerror = () => alert((STRINGS[s.lang] || STRINGS.en).importErr);
+    reader.readAsText(file);
   }
 
   function focusSearch() {

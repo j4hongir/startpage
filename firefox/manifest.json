@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "ts — tech startpage",
-  "version": "1.4.2",
+  "version": "1.4.4",
   "description": "Minimal new tab replacement with fuzzy bookmark search, quick links, and IP info. Replaces the new tab page.",
   "chrome_url_overrides": {
     "newtab": "index.html"
