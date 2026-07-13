@@ -10,9 +10,45 @@
     startpage: 'https://www.startpage.com/do/search?q='
   };
 
+  const STRINGS = {
+    en: {
+      sLang:         'language',
+      sTheme:        'theme',
+      sEngine:       'search engine',
+      sBlocks:       'blocks',
+      sLinks:        'quick links',
+      bSearch:       'search bar',
+      bLinks:        'quick links',
+      bIp:           'ip info',
+      newName:       'name',
+      addBtn:        'add',
+      searchPh:      'search...',
+      ipTitle:       'ip info',
+      ipCheck:       'check',
+      settingsLabel: 'settings',
+    },
+    ru: {
+      sLang:         'язык',
+      sTheme:        'тема',
+      sEngine:       'поисковик',
+      sBlocks:       'блоки',
+      sLinks:        'быстрые ссылки',
+      bSearch:       'строка поиска',
+      bLinks:        'быстрые ссылки',
+      bIp:           'ip info',
+      newName:       'название',
+      addBtn:        'добавить',
+      searchPh:      'поиск...',
+      ipTitle:       'ip info', 
+      ipCheck:       'проверить',
+      settingsLabel: 'настройки',
+    }
+  };
+
   const DEF = {
     theme: 'gruvbox-dark',
     engine: 'google',
+    lang: 'en',
     blocks: { search: true, links: true, ip: true }
   };
 
@@ -173,6 +209,7 @@
 
     if (t.name === 'theme') s.theme = t.value;
     else if (t.name === 'engine') s.engine = t.value;
+    else if (t.name === 'lang') s.lang = t.value;
     else if (t.dataset.block) s.blocks[t.dataset.block] = t.checked;
     else if (t.dataset.eid) updateLinkField(t);
 
@@ -222,6 +259,7 @@
   function renderAll() {
     document.documentElement.dataset.theme = s.theme;
     syncControls();
+    applyLang();
     applyBlocks();
     renderLinks();
     renderEditor();
@@ -230,9 +268,31 @@
   function syncControls() {
     setChecked(`input[name="theme"][value="${s.theme}"]`, true);
     setChecked(`input[name="engine"][value="${s.engine}"]`, true);
+    setChecked(`input[name="lang"][value="${s.lang}"]`, true);
     setChecked('input[data-block="search"]', !!s.blocks.search);
     setChecked('input[data-block="links"]', !!s.blocks.links);
     setChecked('input[data-block="ip"]', !!s.blocks.ip);
+  }
+
+  function applyLang() {
+    const t = STRINGS[s.lang] || STRINGS.en;
+
+    document.documentElement.lang = s.lang;
+
+    document.querySelectorAll('[data-i18n]').forEach(node => {
+      const key = node.dataset.i18n;
+      if (t[key] !== undefined) node.textContent = t[key];
+    });
+
+    document.querySelectorAll('[data-i18n-ph]').forEach(node => {
+      const key = node.dataset.i18nPh;
+      if (t[key] !== undefined) node.placeholder = t[key];
+    });
+
+    document.querySelectorAll('[data-i18n-label]').forEach(node => {
+      const key = node.dataset.i18nLabel;
+      if (t[key] !== undefined) node.setAttribute('aria-label', t[key]);
+    });
   }
 
   function applyBlocks() {
@@ -261,7 +321,6 @@
     el.linksList.replaceChildren(frag);
   }
 
-  // FIX 1: renderEditor — заменяем innerHTML на createElement
   function renderEditor() {
     const frag = document.createDocumentFragment();
     for (const x of s.links) {
@@ -367,7 +426,6 @@
       fav.src = `https://www.google.com/s2/favicons?sz=16&domain_url=${encodeURIComponent(bm.u)}`;
       fav.onerror = () => { fav.style.visibility = 'hidden'; };
 
-      // FIX 2: replaceChildren вместо innerHTML
       const name = document.createElement('span');
       name.className = 'bm-name';
       name.replaceChildren(highlightRanges(bm.n, titleRanges));
@@ -632,7 +690,6 @@
     return [...s0.toLowerCase()].map(ch => map[ch] || ch).join('');
   }
 
-  // FIX 2: highlightRanges возвращает DocumentFragment вместо HTML-строки
   function highlightRanges(str, ranges) {
     const frag = document.createDocumentFragment();
 
@@ -679,7 +736,6 @@
     el.ipCheckBtn.addEventListener('click', fetchIp);
   }
 
-  // FIX 3: fetchIp — replaceChildren вместо innerHTML
   async function fetchIp() {
     el.ipCheckBtn.disabled = true;
     el.ipCheckBtn.textContent = '…';
@@ -710,11 +766,10 @@
       el.ipOutput.replaceChildren(errSpan);
     } finally {
       el.ipCheckBtn.disabled = false;
-      el.ipCheckBtn.textContent = 'check';
+      el.ipCheckBtn.textContent = (STRINGS[s.lang] || STRINGS.en).ipCheck;
     }
   }
 
-  // FIX 3: colorizeJson возвращает DocumentFragment вместо HTML-строки
   function colorizeJson(obj) {
     const vpn = new Set(['is_vpn', 'is_proxy', 'is_tor']);
     const keys = Object.keys(obj);
@@ -786,6 +841,7 @@
     return {
       theme: raw.theme || DEF.theme,
       engine: raw.engine || DEF.engine,
+      lang: raw.lang || DEF.lang,
       blocks: { ...DEF.blocks, ...(raw.blocks || {}) },
       links: Array.isArray(links) && links.length ? links : DEF_LINKS
     };
@@ -795,6 +851,7 @@
     localStorage.setItem(K.CFG, JSON.stringify({
       theme: s.theme,
       engine: s.engine,
+      lang: s.lang,
       blocks: s.blocks
     }));
     localStorage.setItem(K.LINKS, JSON.stringify(s.links));
@@ -814,4 +871,3 @@
     return Math.random().toString(36).slice(2, 10);
   }
 })();
-

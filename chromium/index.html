@@ -8,11 +8,17 @@
   <link rel="stylesheet" href="./style.css">
 </head>
 <body>
-  <button id="settings-btn" aria-label="Settings">⚙</button>
+  <button id="settings-btn" data-i18n-label="settingsLabel" aria-label="Settings">⚙</button>
 
   <aside id="settings-panel" class="hidden">
     <section class="group">
-      <h2>Theme</h2>
+      <h2 data-i18n="sLang">Language</h2>
+      <label><input type="radio" name="lang" value="en">en</label>
+      <label><input type="radio" name="lang" value="ru">ru</label>
+    </section>
+
+    <section class="group">
+      <h2 data-i18n="sTheme">Theme</h2>
       <label><input type="radio" name="theme" value="gruvbox-dark">gruvbox dark</label>
       <label><input type="radio" name="theme" value="gruvbox-light">gruvbox light</label>
       <label><input type="radio" name="theme" value="nord-dark">nord dark</label>
@@ -20,7 +26,7 @@
     </section>
 
     <section class="group">
-      <h2>Search engine</h2>
+      <h2 data-i18n="sEngine">Search engine</h2>
       <label><input type="radio" name="engine" value="google">google</label>
       <label><input type="radio" name="engine" value="duckduckgo">duckduckgo</label>
       <label><input type="radio" name="engine" value="yandex">yandex</label>
@@ -30,19 +36,19 @@
     </section>
 
     <section class="group">
-      <h2>Blocks</h2>
-      <label><input type="checkbox" data-block="search">search bar</label>
-      <label><input type="checkbox" data-block="links">quick links</label>
-      <label><input type="checkbox" data-block="ip">ip info</label>
+      <h2 data-i18n="sBlocks">Blocks</h2>
+      <label><input type="checkbox" data-block="search"><span data-i18n="bSearch">search bar</span></label>
+      <label><input type="checkbox" data-block="links"><span data-i18n="bLinks">quick links</span></label>
+      <label><input type="checkbox" data-block="ip"><span data-i18n="bIp">ip info</span></label>
     </section>
 
     <section class="group">
-      <h2>Quick links</h2>
+      <h2 data-i18n="sLinks">Quick links</h2>
       <div id="editor-list"></div>
       <div class="add">
-        <input id="new-name" type="text" placeholder="Name">
+        <input id="new-name" type="text" data-i18n-ph="newName" placeholder="Name">
         <input id="new-url" type="text" placeholder="https://...">
-        <button id="add-link" type="button">add</button>
+        <button id="add-link" type="button" data-i18n="addBtn">add</button>
       </div>
     </section>
   </aside>
@@ -53,6 +59,7 @@
       <input
         id="search-input"
         type="text"
+        data-i18n-ph="searchPh"
         placeholder="search..."
         autofocus
         role="combobox"
@@ -68,8 +75,8 @@
 
     <section id="ip-block">
       <div class="ip-header">
-        <span class="ip-title">ip info</span>
-        <button id="ip-check-btn" type="button">check</button>
+        <span class="ip-title" data-i18n="ipTitle">ip info</span>
+        <button id="ip-check-btn" type="button" data-i18n="ipCheck">check</button>
       </div>
       <pre id="ip-output" class="ip-output"></pre>
     </section>
@@ -78,4 +85,3 @@
   <script src="./main.js"></script>
 </body>
 </html>
-
